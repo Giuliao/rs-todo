@@ -3,7 +3,7 @@ use serde_json::value::Value;
 use serde_json::Map;
 
 use super::super::enums::TaskStatus;
-use crate::state::{read_file, write_to_file};
+use crate::state::write_to_file;
 
 pub trait Edit {
     fn set_to_done(&self, title: &String, state: &mut Map<String, Value>) {

@@ -2,7 +2,7 @@ use serde_json::json;
 use serde_json::value::Value;
 use serde_json::Map;
 
-use crate::state::{read_file, write_to_file};
+use crate::state::write_to_file;
 
 pub trait Create {
     fn create(&self, title: &String, status: &String, state: &mut Map<String, Value>) {

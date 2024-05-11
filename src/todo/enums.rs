@@ -12,6 +12,14 @@ impl TaskStatus {
             &Self::PENDING => "PENDING".to_string(),
         }
     }
+
+    pub fn from_string(input: String) -> Self {
+        match input.as_str() {
+            "DONE" => Self::DONE,
+            "PENDING" => Self::PENDING,
+            _ => panic!("input {} not supported", input),
+        }
+    }
 }
 
 impl fmt::Display for TaskStatus {
