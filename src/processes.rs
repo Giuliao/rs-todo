@@ -10,7 +10,7 @@ use super::todo::traits::delete::Delete;
 use super::todo::traits::edit::Edit;
 use super::todo::traits::get::Get;
 
-fn processing_pending(item: Pending, command: String, state: &Map<String, Value>) {
+pub fn processing_pending(item: Pending, command: String, state: &Map<String, Value>) {
     let mut state = state.clone();
     match command.as_str() {
         "create" => item.create(
@@ -25,7 +25,7 @@ fn processing_pending(item: Pending, command: String, state: &Map<String, Value>
     }
 }
 
-fn processing_done(item: Done, command: String, state: &Map<String, Value>) {
+pub fn processing_done(item: Done, command: String, state: &Map<String, Value>) {
     let mut state = state.clone();
     match command.as_str() {
         "delete" => item.delete(&item.super_struct.title, &mut state),
