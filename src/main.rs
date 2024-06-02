@@ -1,3 +1,4 @@
+mod json_serialization;
 mod processes;
 mod state;
 mod todo;
@@ -11,7 +12,7 @@ async fn main() -> std::io::Result<()> {
         let app = App::new().configure(views::views_factory);
         return app;
     })
-    .bind("127.0.0.1:8000")?
+    .bind(("127.0.0.1", 8080))?
     .run()
     .await
 }
