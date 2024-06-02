@@ -6,11 +6,13 @@ use crate::todo::todo_factory;
 
 use actix_web::{web, HttpResponse};
 
+use crate::jwt::JwtToken;
 use crate::state::read_file;
 use serde_json::value::Value;
 use serde_json::Map;
 
-pub async fn edit(todo_item: web::Json<TodoItem>) -> HttpResponse {
+pub async fn edit(todo_item: web::Json<TodoItem>, token: JwtToken) -> HttpResponse {
+    println!("here is the token {}", token.message);
     let state: Map<String, Value> = read_file("./state.json");
     let status: TaskStatus;
     match &state.get(&todo_item.title) {
