@@ -6,3 +6,7 @@ run-database:
 	-p 5432:5432 \
 	-v ./tmp/pg_data:/var/lib/postgresql/data \
 	postgres:latest
+
+diesel-init:
+	diesel setup
+	diesel migration run
