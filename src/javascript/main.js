@@ -5,9 +5,9 @@ function renderItems(items, processType, elementId, processFunction) {
     let title = items[i].title;
     let placeholderId = `${processType}-${title.replaceAll(" ", "-")}`;
     placeholder += `
-        <div id="${placeholderId}">
-            ${title}
-            <button id="${placeholderId}">${processType}</button>        
+        <div id="${placeholderId}" class="itemContainer">
+            <p>${title}</p>
+            <button class="actionButton" id="${placeholderId}">${processType}</button>        
         </div>
     `;
     itemsMeta.push({ id: placeholderId, title: title });
@@ -25,6 +25,9 @@ function apiCall(url, method) {
   let xhr = new XMLHttpRequest();
   xhr.withCredentials = true;
   xhr.addEventListener("readystatechange", function () {
+
+    document.getElementById("completeNum").innerHTML = JSON.parse(this.responseText)["done_item_count"];
+    document.getElementById("pendingNum").innerHTML = JSON.parse(this.responseText)["pending_item_count"];
     if (this.readyState === this.DONE) {
       renderItems(
         JSON.parse(this.responseText).pending_items,
