@@ -2,6 +2,7 @@
 extern crate diesel;
 extern crate dotenvy;
 
+mod config;
 mod database;
 mod json_serialization;
 mod jwt;
