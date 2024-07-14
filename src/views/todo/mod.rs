@@ -3,7 +3,7 @@ mod delete;
 mod edit;
 mod get;
 
-use actix_web::web::{delete, get, post, scope, ServiceConfig};
+use actix_web::web::{get, post, scope, ServiceConfig};
 
 pub fn todo_views_factory(app: &mut ServiceConfig) {
     app.service(

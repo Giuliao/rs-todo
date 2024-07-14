@@ -1,7 +1,12 @@
+#[macro_use]
+extern crate diesel;
+extern crate dotenvy;
+
+mod database;
 mod json_serialization;
 mod jwt;
-mod processes;
-mod state;
+mod models;
+mod schema;
 mod todo;
 mod views;
 

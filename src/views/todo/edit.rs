@@ -1,33 +1,20 @@
-use crate::json_serialization::todo_item::TodoItem;
-use crate::json_serialization::todo_items::TodoItems;
-use crate::processes::process_input;
-use crate::todo::enums::TaskStatus;
-use crate::todo::todo_factory;
-
+use crate::diesel;
+use crate::diesel::prelude::*;
 use actix_web::{web, HttpResponse};
 
+use crate::database::establish_connection;
+use crate::json_serialization::todo_item::TodoItem;
+use crate::json_serialization::todo_items::TodoItems;
+
 use crate::jwt::JwtToken;
-use crate::state::read_file;
-use serde_json::value::Value;
-use serde_json::Map;
+use crate::schema::to_do;
 
 pub async fn edit(todo_item: web::Json<TodoItem>, token: JwtToken) -> HttpResponse {
-    println!("here is the token {}", token.message);
-    let state: Map<String, Value> = read_file("./state.json");
-    let status: TaskStatus;
-    match &state.get(&todo_item.title) {
-        Some(result) => status = TaskStatus::new(result.as_str().unwrap()),
-        None => {
-            return HttpResponse::NotFound().json(format!("{} not in state", &todo_item.title));
-        }
-    }
-
-    let existing_item = todo_factory(todo_item.title.as_str(), status.clone());
-    if &status.stringify() == todo_item.status.as_str() {
-        return HttpResponse::Ok().json(TodoItems::get_state());
-    }
-
-    process_input(existing_item, "edit".to_owned(), &state);
+    let mut connection = establish_connection();
+    let results = to_do::table.filter(to_do::columns::title.eq(&todo_item.title));
+    let _ = diesel::update(results)
+        .set(to_do::columns::status.eq("DONE"))
+        .execute(&mut connection);
 
     HttpResponse::Ok().json(TodoItems::get_state())
 }
