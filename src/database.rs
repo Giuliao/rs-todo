@@ -20,14 +20,17 @@ pub struct DbConnection {
 lazy_static! {
     pub static ref DBCONNECTION: DbConnection = {
         dotenv().ok();
-        let mut connection_string = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
-        connection_string = Config::new()
+        let mut connection_string = Config::new()
             .map
             .get("DATABASE_URL")
             .unwrap()
             .as_str()
             .unwrap()
             .to_string();
+        if connection_string.is_empty() {
+            connection_string = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+        }
+
         DbConnection {
             db_connection: PgPool::builder()
                 .max_size(8)
@@ -50,12 +53,10 @@ impl FromRequest for DB {
     type Future = Ready<Result<DB, Error>>;
     fn from_request(_: &HttpRequest, _: &mut Payload) -> Self::Future {
         match DBCONNECTION.db_connection.get() {
-            Ok(connection) => return ok(DB { connection }),
-            Err(_) => {
-                return err(ErrorServiceUnavailable(
-                    "could not make connection to database",
-                ))
-            }
+            Ok(connection) => ok(DB { connection }),
+            Err(_) => err(ErrorServiceUnavailable(
+                "could not make connection to database",
+            )),
         }
     }
 }

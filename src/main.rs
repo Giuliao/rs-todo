@@ -17,7 +17,7 @@ use actix_web::{App, HttpServer};
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
-        let app = App::new()
+        App::new()
             .wrap_fn(|req, srv| {
                 println!("{:?}", req);
                 let future = srv.call(req);
@@ -26,8 +26,7 @@ async fn main() -> std::io::Result<()> {
                     Ok(result)
                 }
             })
-            .configure(views::views_factory);
-        return app;
+            .configure(views::views_factory)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

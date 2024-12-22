@@ -1,8 +1,7 @@
 use std::fs;
 
 pub fn read_file(file_path: &str) -> String {
-    let data = fs::read_to_string(file_path).expect("Unable to read file");
-    data
+    fs::read_to_string(file_path).expect("Unable to read file")
 }
 
 pub fn add_component(component_tag: String, html_data: String) -> String {
@@ -16,5 +15,5 @@ pub fn add_component(component_tag: String, html_data: String) -> String {
     let html_loaded = read_file(&html_path);
     let html_data = html_data.replace(html_tag.as_str(), &html_loaded);
     let html_data = html_data.replace(css_tag.as_str(), &css_loaded);
-    return html_data;
+    html_data
 }
