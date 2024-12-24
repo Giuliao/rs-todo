@@ -52,7 +52,7 @@ impl TodoItems {
             .unwrap();
 
         for item in items {
-            let status = TaskStatus::new(&item.status.as_str());
+            let status = TaskStatus::new(item.status.as_str());
             let item = todo_factory(&item.title, status);
             array_buffer.push(item);
         }

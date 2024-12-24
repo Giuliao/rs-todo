@@ -20,16 +20,13 @@ pub struct DbConnection {
 lazy_static! {
     pub static ref DBCONNECTION: DbConnection = {
         dotenv().ok();
-        let mut connection_string = Config::new()
-            .map
-            .get("DATABASE_URL")
-            .unwrap()
-            .as_str()
-            .unwrap()
-            .to_string();
-        if connection_string.is_empty() {
-            connection_string = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
-        }
+        let connection_string = match Config::new().map.get("DATABASE_URL") {
+            Some(val) => match val.as_str() {
+                Some(v) => v.to_string(),
+                _ => env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string()),
+            },
+            _ => env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string()),
+        };
 
         DbConnection {
             db_connection: PgPool::builder()
