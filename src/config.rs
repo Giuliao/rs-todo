@@ -1,4 +1,3 @@
-use serde_yaml;
 use std::collections::HashMap;
 use std::env;
 
@@ -12,6 +11,7 @@ impl Config {
         let file_path = &args[args.len() - 1];
         let file = std::fs::File::open(file_path).unwrap();
         let map: HashMap<String, serde_yaml::Value> = serde_yaml::from_reader(file).unwrap();
-        return Config { map };
+
+        Config { map }
     }
 }
