@@ -6,7 +6,7 @@ pub async fn logout() -> HttpResponse {
         .body(
             "<html> \
                 <script>\
-                    localStorage.removeItem('user-token'); \
+                    localStorage.removeItem('token'); \
                     window.location.replace(document.location.origin); \
                 </script> \
             </html>",

@@ -6,6 +6,7 @@ use super::content_loader::read_file;
 pub async fn items() -> HttpResponse {
     let mut html_data = read_file("src/templates/main.html");
     html_data = add_component("header".to_string(), html_data);
+    html_data = add_component("login".to_string(), html_data);
     let javascript_data = read_file("src/javascript/main.js");
     let css_data: String = read_file("src/css/main.css");
     let base_css_data: String = read_file("src/css/base.css");
