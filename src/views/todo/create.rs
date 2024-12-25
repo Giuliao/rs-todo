@@ -4,11 +4,12 @@ use diesel::prelude::*;
 
 use crate::database::establish_connection;
 use crate::json_serialization::todo_items::TodoItems;
+use crate::jwt::JwtToken;
 use crate::models::item::item::Item;
 use crate::models::item::new_item::NewItem;
 use crate::schema::to_do;
 
-pub async fn create(req: HttpRequest) -> HttpResponse {
+pub async fn create(token: JwtToken, req: HttpRequest) -> HttpResponse {
     let title: String = req.match_info().get("title").unwrap().to_string();
     let mut connection = establish_connection();
 
@@ -19,11 +20,11 @@ pub async fn create(req: HttpRequest) -> HttpResponse {
         .unwrap();
 
     if items.is_empty() {
-        let new_post = NewItem::new(title, 1);
+        let new_post = NewItem::new(title, token.user_id);
         let _ = diesel::insert_into(to_do::table)
             .values(&new_post)
             .execute(&mut connection);
     }
 
-    HttpResponse::Ok().json(TodoItems::get_state())
+    HttpResponse::Ok().json(TodoItems::get_state(token.user_id))
 }
