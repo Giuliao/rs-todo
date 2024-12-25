@@ -15,14 +15,28 @@ pub struct JwtToken {
     pub user_id: i32,
     #[serde(with = "ts_seconds")]
     pub minted: DateTime<Utc>,
+    pub exp: usize,
 }
 
 impl JwtToken {
     pub fn new(user_id: i32) -> Self {
         let timestamp = Utc::now();
+        let config = Config::new();
+        let minutes = config
+            .map
+            .get("EXPIRATION_MINUTES")
+            .unwrap()
+            .as_i64()
+            .unwrap();
+        let expiration = Utc::now()
+            .checked_add_signed(chrono::Duration::minutes(minutes))
+            .expect("valid timestamp")
+            .timestamp() as usize;
+
         JwtToken {
             user_id,
             minted: timestamp,
+            exp: expiration,
         }
     }
 
@@ -36,13 +50,16 @@ impl JwtToken {
         let key = EncodingKey::from_secret(JwtToken::get_key().as_ref());
         encode(&Header::default(), &self, &key).unwrap()
     }
-    pub fn from_token(token: String) -> Option<Self> {
+    pub fn from_token(token: String) -> Result<Self, String> {
         let key = DecodingKey::from_secret(JwtToken::get_key().as_ref());
         let token_result = decode::<JwtToken>(&token, &key, &Validation::new(Algorithm::HS256));
 
         match token_result {
-            Ok(data) => Some(data.claims),
-            Err(_) => None,
+            Ok(data) => Ok(data.claims),
+            Err(error) => {
+                let message = format!("{}", error);
+                Err(message)
+            }
         }
     }
 }
@@ -57,8 +74,12 @@ impl FromRequest for JwtToken {
                 let raw_token = data.to_str().unwrap().to_string();
                 let token_result = JwtToken::from_token(raw_token);
                 match token_result {
-                    Some(token) => ok(token),
-                    None => {
+                    Ok(token) => ok(token),
+                    Err(message) => {
+                        if message == "ExpiredSignature" {
+                            return err(ErrorUnauthorized("token has expired"));
+                        }
+
                         let error = ErrorUnauthorized("token can't be decoded");
                         err(error)
                     }
